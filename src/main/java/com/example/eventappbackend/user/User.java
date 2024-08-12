@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
     private boolean accountlocked;
     private boolean enabled;
 
-    @ManyToMany(fetch = FetchType.EAGER)// this means when i fetch the user i want eagerly fetch the roles
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -50,8 +50,7 @@ import java.util.stream.Collectors;
 
 
 
-
-    @Override
+   @Override
     public String getName() {
         return email;
     }
@@ -97,5 +96,4 @@ import java.util.stream.Collectors;
     public String fullname() {
         return firstName + " " + lastName;
     }
-
 }

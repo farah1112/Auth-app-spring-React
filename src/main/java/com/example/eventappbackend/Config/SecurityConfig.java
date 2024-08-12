@@ -43,7 +43,10 @@ public class SecurityConfig {
                                         "/swagger-ui.html",
                                         "api/payments/**",
                                         "password/**",
-                                         "/User/**"
+                                         "/User/**",
+                                        "/all-users",
+                                         "/events/**",
+                                        "/uploaded-photos/**"
 
                                 ).permitAll()
                                 .anyRequest()

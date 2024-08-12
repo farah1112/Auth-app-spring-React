@@ -1,16 +1,16 @@
-package com.example.eventappbackend.Controllers;
+package com.example.eventappbackend.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegistrationRequest {
     @NotEmpty(message = "Firstname is mandatory")
     @NotBlank(message = "Firstname is mandatory")
@@ -27,12 +27,14 @@ public class RegistrationRequest {
 
     @NotEmpty(message = "Password is mandatory")
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 8, message = "Password should be at least 8 characters long")
+    @Size(min = 8, message = "password should be 8 characters long minimum")
     private String password;
 
-    // Add role field
+    @NotEmpty(message = "Role is mandatory")
+    @NotBlank(message = "Role is mandatory")
     private String role;
 
-    // No need for custom getter method if you're just accessing role.
-    // Use default Lombok getter.
+    public String getRole() {
+        return role;
+    }
 }

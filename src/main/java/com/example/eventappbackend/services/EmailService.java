@@ -4,6 +4,7 @@ import com.example.eventappbackend.user.EmailTemplateName;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -20,8 +21,10 @@ import static org.springframework.mail.javamail.MimeMessageHelper.MULTIPART_MODE
 @Service
 @RequiredArgsConstructor
 public class EmailService {
-    private  final JavaMailSender mailSender;
-    private final SpringTemplateEngine templateEngine;
+    @Autowired
+    JavaMailSender mailSender;
+    @Autowired
+    SpringTemplateEngine templateEngine;
     @Async // to not make the user wait for the mail to come
 
     public  void  sendEmail(
