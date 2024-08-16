@@ -16,9 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 
@@ -56,8 +59,6 @@ public class EventService {
         String fileName = "photo_" + System.currentTimeMillis() + ".jpg";
         String uploadDir = "uploaded-photos/";
         File uploadFile = new File(uploadDir + fileName);
-
-        // Log file path for debugging
         System.out.println("Uploading file to: " + uploadFile.getAbsolutePath());
 
         // Create the directory if it doesn't exist
@@ -71,16 +72,15 @@ public class EventService {
         return uploadDir + fileName;
     }
 
-    public Subscription subscribe(Long eventId, String email) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + eventId));
-
-        Subscription subscription = new Subscription();
-        subscription.setEvent(event);
-        subscription.setEmail(email);
-
-        return subscriptionRepository.save(subscription);
+    public Event getEventById(Long id) {
+        return eventRepository.findById(id).orElse(null);
     }
+    public List<Event> getEventsByCategoryAndDate(Long currentEventId, EventCategory category, LocalDateTime today) {
+        return eventRepository.findEventsByCategoryAndDate(category, today).stream()
+                .filter(event -> !event.getId().equals(currentEventId)) // Exclude the current event
+                .collect(Collectors.toList());
+    }
+
 
 
 }

@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,7 @@ public class EventController {
         eventService.addEvent(event);
         return ResponseEntity.ok("Event added successfully");
     }
+
     @PutMapping("/event/{id}")
     public ResponseEntity<String> updateEvent(
             @PathVariable Long id,
@@ -92,6 +95,7 @@ public class EventController {
         Page<Event> eventsPage = eventService.getAllEvents(PageRequest.of(page, size));
         return ResponseEntity.ok(eventsPage);
     }
+
     @DeleteMapping("/{id}")
     public void deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
@@ -103,11 +107,6 @@ public class EventController {
         return eventService.getEventsByCategory(eventCategory);
     }
 
-
-    @PostMapping("/subscribe")
-    public Subscription subscribe(@RequestParam Long eventId, @RequestParam String email) {
-        return eventService.subscribe(eventId, email);
-    }
     @PutMapping("/event/{id}/rate")
     public ResponseEntity<String> rateEvent(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
         Event event = eventService.getEvent(id)
@@ -120,6 +119,18 @@ public class EventController {
             return ResponseEntity.ok("Rating updated successfully");
         }
         return ResponseEntity.badRequest().body("Invalid rating");
+    }
+
+    @GetMapping("/similar/{id}")
+    public ResponseEntity<List<Event>> getSimilarEvents(@PathVariable Long id) {
+        Event event = eventService.getEventById(id);
+        if (event == null) {
+            return ResponseEntity.notFound().build();
+        }
+        EventCategory category = event.getCategory();
+        LocalDateTime today = LocalDateTime.now();
+        List<Event> similarEvents = eventService.getEventsByCategoryAndDate(id, category, today);
+        return ResponseEntity.ok(similarEvents);
     }
 
 

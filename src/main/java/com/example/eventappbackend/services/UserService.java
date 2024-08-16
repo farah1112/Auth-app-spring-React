@@ -3,9 +3,12 @@ package com.example.eventappbackend.services;
 import com.example.eventappbackend.Config.JwtService;
 import com.example.eventappbackend.Controllers.RegistrationRequest;
 import com.example.eventappbackend.DTO.UserUpdateDTO;
+import com.example.eventappbackend.Repositories.EventRepository;
 import com.example.eventappbackend.Repositories.RoleRepository;
 import com.example.eventappbackend.Repositories.TokenRepository;
 import com.example.eventappbackend.Repositories.UserRepository;
+import com.example.eventappbackend.entities.Event;
+import com.example.eventappbackend.entities.EventCategory;
 import com.example.eventappbackend.user.*;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
@@ -33,10 +36,13 @@ public class UserService {
     private final  EmailService emailService;
     private  final AuthenticationManager authenticationManager;
     private  final JwtService jwtService;
+    private final EventRepository eventRepository; // Add this
     @Value("${application.mailing.frontend.activationUrl}")
     private String activateUrl;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository, EmailService emailService, AuthenticationManager authenticationManager, JwtService jwtService) {
+
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository, EmailService emailService, AuthenticationManager authenticationManager, JwtService jwtService, EventRepository eventRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -44,6 +50,7 @@ public class UserService {
         this.emailService = emailService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.eventRepository = eventRepository;
     }
 
     public void register(RegistrationRequest request) throws MessagingException {
@@ -219,6 +226,7 @@ public class UserService {
             throw new RuntimeException("User not found");
         }
     }
-    }
+
+}
 
 
