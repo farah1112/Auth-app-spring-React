@@ -20,5 +20,6 @@ public class EventDTO {
     private LocalDateTime endDate;
     private String location;
     private  String photo;
+
 }
 

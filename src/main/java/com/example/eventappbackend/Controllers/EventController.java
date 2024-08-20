@@ -132,6 +132,11 @@ public class EventController {
         List<Event> similarEvents = eventService.getEventsByCategoryAndDate(id, category, today);
         return ResponseEntity.ok(similarEvents);
     }
+    @GetMapping("/latest")
+    public ResponseEntity<List<Event>> getLatestEvents() {
+        List<Event> latestEvents = eventService.getLatestEvents();
+        return ResponseEntity.ok(latestEvents);
+    }
 
 
 }

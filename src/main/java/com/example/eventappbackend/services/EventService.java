@@ -64,7 +64,6 @@ public class EventService {
         // Create the directory if it doesn't exist
         uploadFile.getParentFile().mkdirs();
 
-        // Save the file
         try (FileOutputStream fos = new FileOutputStream(uploadFile)) {
             fos.write(photo.getBytes());
         }
@@ -81,6 +80,9 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-
+    public List<Event> getLatestEvents() {
+        Pageable topThree = PageRequest.of(0, 3);
+        return eventRepository.findLatestEvents(topThree);
+    }
 
 }
