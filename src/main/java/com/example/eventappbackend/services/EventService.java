@@ -56,19 +56,26 @@ public class EventService {
 
 
     public String uploadPhoto(MultipartFile photo) throws IOException {
+        // Generate a unique file name for the photo
         String fileName = "photo_" + System.currentTimeMillis() + ".jpg";
-        String uploadDir = "uploaded-photos/";
+        // Define the directory within resources/static where photos will be uploaded
+        String uploadDir = "src/main/resources/static/";
+        // Create the file object with the full path
         File uploadFile = new File(uploadDir + fileName);
-        System.out.println("Uploading file to: " + uploadFile.getAbsolutePath());
 
-        // Create the directory if it doesn't exist
+        // Ensure that the directory exists
         uploadFile.getParentFile().mkdirs();
 
+        // Write the photo to the file system
         try (FileOutputStream fos = new FileOutputStream(uploadFile)) {
             fos.write(photo.getBytes());
         }
 
-        return uploadDir + fileName;
+        // Generate the relative URL for the uploaded photo
+        String photoUrl = "/" + fileName;
+
+        // Return the URL to be stored in the database
+        return photoUrl;
     }
 
     public Event getEventById(Long id) {

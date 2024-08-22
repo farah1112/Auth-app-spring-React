@@ -46,7 +46,7 @@ public class SecurityConfig {
                                          "/User/**",
                                         "/all-users",
                                          "/events/**",
-                                        "/uploaded-photos/**"
+                                        "/**"
 
                                 ).permitAll()
                                 .anyRequest()

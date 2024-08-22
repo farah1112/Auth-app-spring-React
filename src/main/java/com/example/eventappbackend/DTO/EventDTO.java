@@ -4,6 +4,7 @@ import com.example.eventappbackend.entities.EventCategory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,7 @@ public class EventDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDate;
     private String location;
-    private  String photo;
+    private MultipartFile photo;
 
 }
 

@@ -4,6 +4,7 @@ import com.example.eventappbackend.DTO.EventDTO;
 import com.example.eventappbackend.entities.Event;
 import com.example.eventappbackend.entities.EventCategory;
 import com.example.eventappbackend.entities.Subscription;
+import com.example.eventappbackend.services.CloudinaryService;
 import com.example.eventappbackend.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +28,39 @@ import java.util.Optional;
 public class EventController {
     @Autowired
     private EventService eventService;
+
+   /* @PostMapping("/event/add")
+    public ResponseEntity<String> addEvent(
+            @RequestParam String title,
+            @RequestParam String category,
+            @RequestParam(required = false) String description,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(required = false) String location,
+            @RequestParam(value = "photo", required = false) MultipartFile photo) throws IOException {
+
+        if (title == null || category == null) {
+            return ResponseEntity.badRequest().body("Title and category are required.");
+        }
+
+        Event event = new Event();
+        event.setTitle(title);
+        event.setCategory(EventCategory.valueOf(category.toUpperCase()));
+        event.setDescription(description);
+        event.setStartDate(startDate);
+        event.setEndDate(endDate);
+        event.setLocation(location);
+
+        if (photo != null && !photo.isEmpty()) {
+            String photoUrl = eventService.uploadPhoto(photo);
+            event.setPhoto(photoUrl); // Store the relative URL in the database
+        }
+
+        eventService.addEvent(event);
+        return ResponseEntity.ok("Event added successfully");
+    }*/
+   @Autowired
+   private CloudinaryService cloudinaryService;
 
     @PostMapping("/event/add")
     public ResponseEntity<String> addEvent(
@@ -50,15 +85,15 @@ public class EventController {
         event.setLocation(location);
 
         if (photo != null && !photo.isEmpty()) {
-            String photoPath = eventService.uploadPhoto(photo);
-            event.setPhoto(photoPath);
+            String photoUrl = cloudinaryService.uploadImage(photo); // Upload to Cloudinary
+            event.setPhoto(photoUrl); // Store the URL in the database
         }
 
         eventService.addEvent(event);
         return ResponseEntity.ok("Event added successfully");
     }
 
-    @PutMapping("/event/{id}")
+  /*  @PutMapping("/event/{id}")
     public ResponseEntity<String> updateEvent(
             @PathVariable Long id,
             @ModelAttribute EventDTO eventDTO,
@@ -80,7 +115,30 @@ public class EventController {
 
         eventService.updateEvent(existingEvent);
         return ResponseEntity.ok("Event updated successfully");
-    }
+    }*/
+  @PutMapping("/event/{id}")
+  public ResponseEntity<String> updateEvent(
+          @PathVariable Long id,
+          @ModelAttribute EventDTO eventDTO,
+          @RequestParam(value = "photo", required = false) MultipartFile photo) throws IOException {
+
+      Event existingEvent = eventService.getEvent(id)
+              .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + id));
+      existingEvent.setTitle(eventDTO.getTitle());
+      existingEvent.setCategory(EventCategory.valueOf(eventDTO.getCategory().toUpperCase()));
+      existingEvent.setDescription(eventDTO.getDescription());
+      existingEvent.setStartDate(eventDTO.getStartDate());
+      existingEvent.setEndDate(eventDTO.getEndDate());
+      existingEvent.setLocation(eventDTO.getLocation());
+
+      if (photo != null && !photo.isEmpty()) {
+          String photoUrl = cloudinaryService.uploadImage(photo);  // Use Cloudinary to upload the image
+          existingEvent.setPhoto(photoUrl);
+      }
+
+      eventService.updateEvent(existingEvent);
+      return ResponseEntity.ok("Event updated successfully");
+  }
 
     @GetMapping("/event/{id}")
     public Optional<Event> getEvent(@PathVariable Long id) {
@@ -108,7 +166,7 @@ public class EventController {
     }
 
     @PutMapping("/event/{id}/rate")
-    public ResponseEntity<String> rateEvent(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
+    public ResponseEntity<Map<String, String>> rateEvent(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
         Event event = eventService.getEvent(id)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + id));
 
@@ -116,10 +174,15 @@ public class EventController {
         if (rating != null) {
             event.setRating(rating); // Add rating field to your Event entity
             eventService.updateEvent(event);
-            return ResponseEntity.ok("Rating updated successfully");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Rating updated successfully");
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.badRequest().body("Invalid rating");
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("message", "Invalid rating");
+        return ResponseEntity.badRequest().body(errorResponse);
     }
+
 
     @GetMapping("/similar/{id}")
     public ResponseEntity<List<Event>> getSimilarEvents(@PathVariable Long id) {
